@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Bonne Année</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #1a1a1a;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            color: white;
+            overflow: hidden;
+        }
+        h1 {
+            color: #f1c40f;
+            font-size: 2.5em;
+            margin-top: 20px;
+            animation: fadeInDown 1s;
+        }
+        form {
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            display: inline-block;
+            padding: 20px;
+            margin-top: 30px;
+            width: 90%;
+            max-width: 400px;
+            animation: fadeInUp 1s;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="file"] {
+            width: 90%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus, input[type="file"]:focus {
+            border-color: #f1c40f;
+        }
+        button {
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #c0392b;
+        }
+        #greeting {
+            margin-top: 30px;
+            animation: fadeIn 2s;
+        }
+        #userPhoto {
+            max-width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin-top: 20px;
+            animation: bounceIn 2s ease-in-out;
+        }
+        #fireworks {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        #countdown {
+            font-size: 3em;
+            margin-top: 20px;
+            color: #e74c3c;
+            animation: fadeIn 2s;
+        }
+        .stars {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            overflow: hidden;
+            z-index: -1;
+        }
+        .stars span {
+            position: absolute;
+            display: block;
+            width: 2px;
+            height: 2px;
+            background: white;
+            animation: twinkle 5s infinite;
+        }
+        .moon {
+            position: fixed;
+            top: 10%;
+            right: 10%;
+            width: 100px;
+            height: 100px;
+            background-color: #f1c40f;
+            border-radius: 50%;
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.7);
+            animation: moonMove 5s infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        @keyframes moonMove {
+            0% { top: 10%; right: 10%; }
+            50% { top: 15%; right: 15%; }
+            100% { top: 10%; right: 10%; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 1; }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .share-icon {
+            background: url('https://icon-library.com/images/share-icon-png/share-icon-png-2.jpg') no-repeat center center;
+            background-size: cover;
+            width: 30px;
+            height: 30px;
+            display: inline-block;
+            vertical-align: middle;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        @media (max-width: 600px) {
+            form { width: 90%; }
+            h1 { font-size: 2em; }
+            button { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Bonne Année !</h1>
+    <div id="countdown"></div>
+    <form id="userForm">
+        <label for="name">Entrez votre nom:</label>
+        <input type="text" id="name" name="name" required>
+        <br>
+        <label for="photo">Téléchargez votre photo:</label>
+        <input type="file" id="photo" name="photo" accept="image/*" required>
+        <br>
+        <button type="submit">Soumettre</button>
+    </form>
+    <div id="greeting" style="display:none;">
+        <h2>Bonne Année, <span id="userName"></span>!</h2>
+        <img id="userPhoto" src="" alt="Photo de l'utilisateur">
+        <button id="shareBtn">Partager <span class="share-icon"></span></button>
+    </div>
+    <div class="stars">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <div class="moon"></div>
+    <canvas id="fireworks"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/fireworks-js/dist/fireworks.js"></script>
+    <script>
+        document.getElementById('userForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const photo = document.getElementById('photo').files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('userPhoto').src = e.target.result;
+                document.getElementById('userName').textContent = name;
+                document.getElementById('greeting').style.display = 'block';
+                document.getElementById('userForm').style.display = 'none';
+                startFireworks();
+            };
+            reader.readAsDataURL(photo);
+        });
+
+        function startFireworks() {
+            const container = document.getElementById('fireworks');
+            const fireworks = new Fireworks(container, {
+                autoresize: true,
+                opacity: 0.5,  // Moins intense
+                acceleration: 1.05,
+                friction: 0.97,
+                gravity: 1.5,
+                particles: 150,  // Plus de particules pour plus de douceur
+                traceLength: 7,  // Traînées plus longues
+                explosion: 2,    // Moins d'explosions
+                intensity: 15,   // Moins d'intensité
+                flickering: 30,  // Moins de scintillement
+                lineWidth: 3,    // Traînées plus épaisses pour plus de douceur
+                hue: { min: 200, max: 360 },
+                delay: { min: 50, max: 80 },  // Plus lent
+                rocketsPoint: { min: 50, max: 50 },
+                lineStyle: 'round',
+                autoresize: true
+            });
+            fireworks.start();
+        }
+
+        document.getElementById('shareBtn').addEventListener('click', function() {
+            const name = document.getElementById('userName').textContent;
+            const message = `Bonne Année, ${name} !`;
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Bonne Année',
+                    text: message,
+                    url: window.location.href
+                }).then(() => {
+                    console.log('Partagé avec succès');
+                }).catch((error) => {
+                    console.error('Erreur lors du partage', error);
+                });
+            } else {
+                alert('La fonctionnalité de partage n\'est pas supportée sur ce navigateur.');
+            }
+        });
+
+        const targetDate = new Date('December 31, 2024 23:59:59').getTime();
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const remainingTime = targetDate - now;
+
+            if (remainingTime <= 0) {
+                document.getElementById('countdown').textContent = "Bonne Année !";
+                return;
+            }
+
+            const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+
+            document.getElementById('countdown').textContent = `${days} jours ${hours.toString().padStart(2, '0')} : ${minutes.toString().padStart(2, '0')} : ${seconds.toString().padStart(2, '0')}`;
+        }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+    </script>
+</body>
+</html>
